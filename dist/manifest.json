@@ -1,0 +1,15 @@
+{
+  "name": "devbox",
+  "version": "0.1.0",
+  "files": [
+    "console.js",
+    "devbox.css",
+    "inspect.js",
+    "runner.js",
+    "transform.js",
+    "typescript.js"
+  ],
+  "runners": [
+    "runner.js"
+  ]
+}

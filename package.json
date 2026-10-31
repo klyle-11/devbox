@@ -1,0 +1,37 @@
+{
+  "name": "devbox",
+  "version": "0.1.0",
+  "description": "A console for small programs, in the browser and on the device: a session per language that keeps what each entry defines, values drawn as a browser's console draws them (trees, tables, getters), and the session's variables beside it. JavaScript and TypeScript to begin with.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/klyle-11/devbox.git"
+  },
+  "exports": {
+    "./console": "./dist/console.js",
+    "./inspect": "./dist/inspect.js",
+    "./transform": "./dist/transform.js",
+    "./typescript": "./dist/typescript.js",
+    "./devbox.css": "./dist/devbox.css",
+    "./manifest.json": "./dist/manifest.json"
+  },
+  "files": [
+    "dist",
+    "API.md",
+    "AGENTS.md",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node --test test/transform.test.mjs && node test/browser.mjs",
+    "test:transform": "node --test test/transform.test.mjs",
+    "test:browser": "node test/browser.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.10",
+    "playwright-core": "^1.56.1",
+    "sucrase": "3.35.0"
+  }
+}

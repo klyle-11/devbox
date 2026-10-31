@@ -1,0 +1,108 @@
+/* Devbox's console and viewer. The host themes it through these variables (the hub maps its own colours onto them);
+   the values here are what it looks like with none set. Nothing here reaches outside .devbox. */
+.devbox {
+  --db-bg: Canvas; --db-fg: CanvasText; --db-panel: color-mix(in srgb, CanvasText 4%, Canvas);
+  --db-line: color-mix(in srgb, CanvasText 14%, Canvas); --db-muted: color-mix(in srgb, CanvasText 55%, Canvas);
+  --db-accent: #2f6fdb; --db-error: #c4302b; --db-warn: #a66a00; --db-info: #2f6fdb;
+  --db-string: #b4441b; --db-number: #1d4fc4; --db-keyword: #8a3fb0; --db-key: #7a2c8a; --db-fn: inherit;
+  --db-mono: ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace; --db-size: 13px;
+}
+@media (prefers-color-scheme: dark) {
+  .devbox { --db-string: #f29766; --db-number: #8fb4ff; --db-keyword: #d49cf0; --db-key: #e5a3f0; --db-accent: #7aa7ff; --db-error: #ff7b72; --db-warn: #e3b341; --db-info: #7aa7ff; }
+}
+.devbox {
+  container-type: inline-size;
+  display: flex; flex-direction: column; height: 100%; min-height: 0; box-sizing: border-box;
+  background: var(--db-bg); color: var(--db-fg); font: var(--db-size)/1.45 var(--db-mono);
+}
+.devbox *, .devbox *::before, .devbox *::after { box-sizing: border-box; }
+.devbox button { font: inherit; color: inherit; }
+
+.db-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 6px 8px; border-bottom: 1px solid var(--db-line); background: var(--db-panel); }
+.db-btn, .db-lang { min-height: 28px; padding: 2px 10px; border: 1px solid var(--db-line); border-radius: 4px; background: var(--db-bg); color: var(--db-fg); cursor: pointer; font: inherit; }
+.db-btn:hover, .db-lang:hover { border-color: var(--db-muted); }
+.db-status { color: var(--db-muted); font-size: 12px; margin-left: auto; }
+
+/* Upright or narrow: what was run, the variables (folded away if wanted), the entry box. Wide: the variables beside. */
+.db-main { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto auto;
+  grid-template-areas: "log" "vars" "input"; }
+.db-log { grid-area: log; overflow: auto; overscroll-behavior: contain; min-height: 0; }
+.db-vars { grid-area: vars; overflow: auto; min-height: 0; max-height: 35vh; border-top: 1px solid var(--db-line); background: var(--db-panel); }
+.db-input { grid-area: input; border-top: 1px solid var(--db-line); padding: 6px 8px; background: var(--db-bg); }
+/* (after the rules above, which it overrides) */
+@container (min-width: 720px) {
+  .db-main { grid-template-columns: minmax(0, 1fr) minmax(220px, 32%); grid-template-rows: minmax(0, 1fr) auto; grid-template-areas: "log vars" "input vars"; }
+  .db-vars { border-left: 1px solid var(--db-line); border-top: 0; max-height: none; }
+}
+
+.db-entry { padding: 4px 8px 6px; border-bottom: 1px solid var(--db-line); }
+.db-entry.db-note { color: var(--db-muted); font-style: italic; }
+.db-entry.db-error { color: var(--db-error); }
+.db-echo { display: flex; gap: 6px; align-items: baseline; cursor: pointer; }
+.db-echo:hover .db-code { text-decoration: underline dotted var(--db-muted); }
+.db-prompt { color: var(--db-accent); flex: none; user-select: none; }
+.db-code { flex: 1; min-width: 0; margin: 0; font: inherit; white-space: pre-wrap; overflow-wrap: anywhere; background: none; padding: 0; }
+.db-code.db-errat { background: linear-gradient(to bottom, transparent calc(var(--db-err-line) * 1.45em), color-mix(in srgb, var(--db-error) 16%, transparent) calc(var(--db-err-line) * 1.45em),
+  color-mix(in srgb, var(--db-error) 16%, transparent) calc((var(--db-err-line) + 1) * 1.45em), transparent calc((var(--db-err-line) + 1) * 1.45em)); }
+.db-n { color: var(--db-muted); font-size: 11px; flex: none; }
+.db-out { padding-left: 14px; }
+.db-line, .db-result, .db-error { white-space: pre-wrap; overflow-wrap: anywhere; padding: 1px 0; }
+.db-line { padding-left: calc(var(--db-depth, 0) * 14px); }
+.db-warn { color: var(--db-warn); background: color-mix(in srgb, var(--db-warn) 10%, transparent); }
+.db-line.db-error { color: var(--db-error); background: color-mix(in srgb, var(--db-error) 8%, transparent); }
+.db-info { color: var(--db-info); }
+.db-debug { color: var(--db-muted); }
+.db-late { border-top: 1px dashed var(--db-line); margin: 0; padding: 2px 8px; }
+.db-error { color: var(--db-error); }
+.db-errtext { color: var(--db-error); }
+.db-arrowin { color: var(--db-muted); margin-right: 6px; user-select: none; }
+.db-at { color: var(--db-muted); font-size: 11px; margin-left: 1em; }
+.db-dim { color: var(--db-muted); }
+
+/* Values */
+.db-string.db-quoted, .db-symbol, .db-regexp { color: var(--db-string); }
+.db-number, .db-bigint { color: var(--db-number); }
+.db-boolean, .db-null, .db-undefined, .db-empty { color: var(--db-keyword); }
+.db-undefined, .db-empty { opacity: .75; }
+.db-fn { color: var(--db-fn); font-style: italic; }
+.db-tree { display: inline; }
+.db-head { cursor: pointer; }
+.db-turn { display: inline-block; width: 1.2em; padding: 0; border: 0; background: none; color: var(--db-muted); cursor: pointer; text-align: left; }
+.db-kids[hidden] { display: none; }
+.db-kids { display: block; margin-left: .55em; padding-left: 12px; border-left: 1px dotted var(--db-line); }
+.db-row { display: block; white-space: pre-wrap; overflow-wrap: anywhere; }
+.db-k { color: var(--db-key); }
+.db-dimrow > .db-k { opacity: .65; }
+.db-inner { font-style: italic; }
+.db-colon, .db-arrow { color: var(--db-muted); }
+.db-more, .db-getter { padding: 0 4px; border: 0; background: none; color: var(--db-accent); cursor: pointer; text-align: left; }
+.db-more:disabled { color: var(--db-muted); cursor: default; }
+.db-strbox { display: inline; }
+.db-tablewrap { overflow-x: auto; max-width: 100%; margin: 4px 0; }
+.db-table { border-collapse: collapse; font-size: .95em; }
+.db-table th, .db-table td { border: 1px solid var(--db-line); padding: 1px 6px; text-align: left; vertical-align: top; white-space: nowrap; max-width: 24em; overflow: hidden; text-overflow: ellipsis; }
+.db-table thead th { background: var(--db-panel); font-weight: 600; }
+.db-table tbody th { color: var(--db-muted); font-weight: normal; }
+
+/* The variables */
+.db-varshead { padding: 6px 8px; cursor: pointer; color: var(--db-muted); font-weight: 600; position: sticky; top: 0; background: var(--db-panel); }
+.db-varlist { padding: 0 8px 8px; }
+.db-varlist > p { margin: 4px 0; font-style: italic; }
+.db-var { padding: 2px 0; white-space: pre-wrap; overflow-wrap: anywhere; border-bottom: 1px solid color-mix(in srgb, var(--db-line) 50%, transparent); }
+.db-kind { display: inline-block; min-width: 3.2em; margin-right: 4px; color: var(--db-muted); font-size: 10px; text-transform: lowercase; }
+.db-name { padding: 0; border: 0; background: none; color: var(--db-key); font-weight: 600; cursor: pointer; }
+
+/* The entry box */
+.db-inrow { display: flex; align-items: flex-start; gap: 6px; }
+.db-inrow .db-prompt { line-height: 1.45; padding-top: 1px; }
+.db-area { flex: 1; min-width: 0; min-height: 1.6em; margin: 0; padding: 1px 0; border: 0; outline: 0; resize: none; background: transparent; color: inherit; font: inherit; line-height: 1.45; overflow-y: auto; }
+.db-area::placeholder { color: var(--db-muted); }
+.db-run { flex: none; }
+.db-keys { display: flex; gap: 4px; overflow-x: auto; padding-top: 6px; scrollbar-width: none; }
+.db-key { flex: none; min-width: 40px; height: 40px; padding: 0 6px; border: 1px solid var(--db-line); border-radius: 6px; background: var(--db-panel); color: var(--db-fg); }
+/* A touch screen: buttons a finger can hit, and a box iOS does not zoom into (it does below 16px). */
+@media (pointer: coarse) {
+  .db-btn, .db-lang { min-height: 44px; padding: 2px 14px; }
+  .db-area { font-size: 16px; }
+  .db-turn { width: 1.6em; }
+}
